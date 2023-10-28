@@ -6,6 +6,7 @@ const trainerModel = require('../models/trainerModel');
 const productModel = require('../models/productModel');
 const userRouter = require('./userRouter');
 const logModel = require('../models/logModel');
+const bookModel = require('../models/bookModel');
 
 const bcrypt = require('bcryptjs')
 //to reg the trainer
