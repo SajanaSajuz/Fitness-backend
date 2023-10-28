@@ -39,6 +39,44 @@ const bcrypt = require('bcryptjs')
 // });
 
 
+adminRouter.get("/view-book-requests",async(req,res)=>{
+    try{
+      const bookeddata= await bookModel.aggregate([
+        {
+            '$lookup': {
+              'from': 'trainer_tbs', 
+              'localField': 'trainer_id', 
+              'foreignField': 'Login_id', 
+              'as': 'adminview'
+            }
+          },
+          {
+            $unwind: "$adminview",
+          },
+          {
+            $group: {
+              _id: "$_id", 
+              status:{$first:"$status"},
+              TrainerName: { $first:"$adminview.TrainerName" },
+              Phone: { $first: "$adminview.Phone" },
+              Class: { $first: "$adminview.Class" },
+            },
+          },
+      ])
+      console.log(bookeddata);
+      if(bookeddata){
+  
+        return res.status(200).json({ success: true, error: false, message: "data needs to approved",adminview_details:bookeddata});
+      }
+      else {
+  
+        return res.status(400).json({ success: false, error: true, message: "Not yet confirmed" })
+    }
+    }
+    catch(error){
+  
+    }
+  })
 
 adminRouter.post( "/addtrainer", async (req, res) => {
     try {
