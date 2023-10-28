@@ -43,7 +43,7 @@ const bcrypt = require('bcryptjs')
 adminRouter.get("/view-book-requests",async(req,res)=>{
     try{
       const bookeddata= await bookModel.aggregate([
-        {
+     {
             '$lookup': {
               'from': 'trainer_tbs', 
               'localField': 'trainer_id', 
@@ -52,17 +52,20 @@ adminRouter.get("/view-book-requests",async(req,res)=>{
             }
             
           },
-          {
-            '$lookup': {
-              'from': 'reg_tbs', 
-              'localField': 'username', 
-              'foreignField': 'Username', 
-              'as': 'adminuserview'
-            }
-            
-          },
+          
+  {
+    '$lookup': {
+      'from': 'reg_tbs', 
+      'localField': 'user_id', 
+      'foreignField': 'Login_id', 
+      'as': 'adminuserview'
+    }
+  },
           {
             $unwind: "$adminview",
+          },
+          {
+            $unwind: "$adminuserview",
           },
           {
             $group: {
@@ -71,15 +74,7 @@ adminRouter.get("/view-book-requests",async(req,res)=>{
               TrainerName: { $first:"$adminview.TrainerName" },
               Phone: { $first: "$adminview.Phone" },
               Class: { $first: "$adminview.Class" },
-            },
-          },
-          {
-            $unwind: "$adminuserview",
-          },
-          {
-            $group: {
-              _id: "$_id", 
-              Username: { $first: "$adminuserview.Username" },
+              Name: { $first: "$adminuserview.Name" },
             },
           },
       ])
