@@ -50,6 +50,16 @@ adminRouter.get("/view-book-requests",async(req,res)=>{
               'foreignField': 'Login_id', 
               'as': 'adminview'
             }
+            
+          },
+          {
+            '$lookup': {
+              'from': 'reg_tbs', 
+              'localField': 'username', 
+              'foreignField': 'Username', 
+              'as': 'adminuserview'
+            }
+            
           },
           {
             $unwind: "$adminview",
@@ -61,6 +71,15 @@ adminRouter.get("/view-book-requests",async(req,res)=>{
               TrainerName: { $first:"$adminview.TrainerName" },
               Phone: { $first: "$adminview.Phone" },
               Class: { $first: "$adminview.Class" },
+            },
+          },
+          {
+            $unwind: "$adminuserview",
+          },
+          {
+            $group: {
+              _id: "$_id", 
+              Username: { $first: "$adminuserview.Username" },
             },
           },
       ])
