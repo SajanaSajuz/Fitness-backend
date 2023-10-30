@@ -92,6 +92,7 @@ bookRouter.get("/viewbook/", checkAuth, async (req, res) => {
           Image: { $first: "$trainer.Image"},
           Phone: { $first: "$trainer.Phone" },
           Class: { $first: "$trainer.Class" },
+          status: { $first: "$status" },
         },
       },
     ]);
