@@ -47,10 +47,10 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
       
   {
     '$lookup': {
-      'from': 'product_tbs', 
-      'localField': 'product_id', 
-      'foreignField': '_id', 
-      'as': 'productbook'
+      from: 'product_tbs', 
+      localField: 'product_id', 
+      foreignField: '_id', 
+      as: 'productbook',
     }
   },
 
@@ -72,15 +72,30 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
           Price: { $first: "$productbook.Price"},
           quantity: { $first:"$quantity"},
           user_id: { $first:"$user_id"},
+          
+         
         },
       },
     ]);
     console.log(bookingdata);
-    // const userdata= await bookModel.find();
+
+    //adding cart amount
+    let total=0
+    for(i=0;i<data.length;i++){
+      console.log(data[i].quantity*data[i].Price);
+      total += data[i].quantity*data[i].Price
+      console.log(total);
+    
+    }
+   
+
+
+
+
     if (data[0]) {
       return res
         .status(200)
-        .json({ success: true, error: false, productbook_details: data });
+        .json({ success: true, error: false,Total_amount:total, productbook_details: data, });
     } else {
       return res
         .status(400)

@@ -121,9 +121,9 @@ adminRouter.get("/accept/:id", async (req, res) => {
 adminRouter.get("/decline/:id", async (req, res) => {
   try {
     const bookid = req.params.id;
-    const datas = await bookModel.deleteOne({ _id:bookid });
+    const datas = await bookModel.updateOne({ _id:bookid },{$set:{status:2}});
 console.log(bookid,datas);
-    if (datas.deletedCount== 1) {
+    if (datas.modifiedCount== 1) {
       return res
         .status(200)
         .json({
