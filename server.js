@@ -14,6 +14,7 @@ const adminRouter= require('./src/routes/adminRouter');
 const bodyParser = require('body-parser');
 const userRouter = require('./src/routes/userRouter');
 const bookRouter = require('./src/routes/bookRouter');
+const ProductbookRouter = require('./src/routes/ProductbookRouter');
 
 
 app.use(bodyParser())
@@ -43,6 +44,7 @@ app.use('/trainer',trainerRouter)
 app.use('/admin',adminRouter)
 app.use('/user',userRouter)
 app.use('/book',bookRouter)
+app.use('/productbook',ProductbookRouter)
 // app.use('/addtrainer',adminRouter)
 // app.use('/trainerdetails',adminRouter)
 
