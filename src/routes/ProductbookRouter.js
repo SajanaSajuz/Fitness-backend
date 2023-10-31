@@ -17,7 +17,7 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
       res.status(201).json({
         success: true,
         error: false,
-        message: "Your booking is requested",
+        message: "Your booking is added to cart",
         details: result,
       });
     }
@@ -28,7 +28,7 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
       .json({
         success: false,
         error: true,
-        message: "Appointment not completed",
+        message: "booking not completed",
       });
     console.log(error);
   }
@@ -87,11 +87,6 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
       console.log(total);
     
     }
-   
-
-
-
-
     if (data[0]) {
       return res
         .status(200)
@@ -107,4 +102,54 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
       .json({ success: false, error: true, message: "something went wrong" });
   }
 });
+
+
+ProductbookRouter.get("/increment/:regid",async(req,res)=>{
+  try{
+  cartid = req.params.regid;
+  cartdata=await ProductbookModel.findOne({_id:cartid})
+  const data ={
+    quantity:(cartdata.quantity)+1
+  }
+  console.log(data);
+  const datas =await ProductbookModel.updateOne({_id:cartid},{$set:data})
+  if (datas.modifiedCount==1){
+    return res.status(200).json({success:true,error:false,message:"quantity increased",result:datas})
+  }
+else{
+  return res.status(400).json({succes:false,error:true,message:"failed to increase"})
+}
+  }
+catch(error){
+
+}
+})
+
+
+ProductbookRouter.get("/decrement/:regid",async(req,res)=>{
+  try{
+    const cartid = req.params.regid;
+    const cartdata= await ProductbookModel.findOne({_id:cartid})
+    const data={
+      quantity :(cartdata.quantity)-1 
+    }
+    console.log(data);
+    
+    const datas = await ProductbookModel.updateOne({ _id: cartid},{$set:data}); 
+    
+    if(datas.modifiedCount==1){
+
+      return res.status(200).json({ success: true, error: false, message: "Quantity is decreased", result:datas});
+    }
+    
+
+    else {
+
+      return res.status(400).json({ success: false, error: true, message: "Failed to decrease" })
+  }
+  }
+  catch(error){
+
+  }
+})
 module.exports = ProductbookRouter;

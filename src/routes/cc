@@ -1,0 +1,53 @@
+cartRouter.get("/increment/:id",async(req,res)=>{
+  try{
+    const cartid = req.params.id;
+    const cartdata= await cartModel.findOne({_id:cartid})  //_id is from model here anything inside model can be given
+    const data={
+      quantity : (cartdata.quantity)+1 //quanity string so parseint
+    }
+    console.log("quantity",data);
+    
+    const datas = await cartModel.updateOne({ _id: cartid},{$set:data});  //{staus:1}
+    
+    if(datas.modifiedCount==1){
+
+      return res.status(200).json({ success: true, error: false, message: "increased", result:datas});
+    }
+    
+
+    else {
+
+      return res.status(400).json({ success: false, error: true, message: "Failed to increase" })
+  }
+  }
+  catch(error){
+
+  }
+})
+
+cartRouter.post("/decrement/:id",async(req,res)=>{
+  try{
+    const cartid = req.params.id;
+    const cartdata= await cartModel.findOne({_id:cartid})  //_id is from model here anything inside model can be given
+    const data={
+      quantity : parseInt(cartdata.quantity)-1 //quanity string so parseint
+    }
+    console.log(data);
+    
+    const datas = await cartModel.updateOne({ _id: cartid},{$set:data}); 
+    
+    if(datas.modifiedCount==1){
+
+      return res.status(200).json({ success: true, error: false, message: "decreaseed", result:datas});
+    }
+    
+
+    else {
+
+      return res.status(400).json({ success: false, error: true, message: "Failed to increase" })
+  }
+  }
+  catch(error){
+
+  }
+})
