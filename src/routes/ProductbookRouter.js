@@ -83,14 +83,15 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
     let total=0
     for(i=0;i<data.length;i++){
       console.log(data[i].quantity*data[i].Price);
-      total += data[i].quantity*data[i].Price
+      singleprice=data[i].quantity*data[i].Price
+      total = total+singleprice
       console.log(total);
     
     }
     if (data[0]) {
       return res
         .status(200)
-        .json({ success: true, error: false,Total_amount:total, productbook_details: data, });
+        .json({ success: true, error: false,Total_amount:total,singleprice:singleprice, productbook_details: data, });
     } else {
       return res
         .status(400)
