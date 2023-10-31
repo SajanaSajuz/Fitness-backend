@@ -116,7 +116,7 @@ userRouter.get("/user-productdetails/:regid",async (req, res) => {
     try{
         const productid =req.params.regid
         console.log(productid);
-        const data=await trainerModel.findOne({_id:productid})
+        const data=await productModel.findOne({_id:productid})
 
         if (data) { 
 
