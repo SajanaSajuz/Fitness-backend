@@ -91,7 +91,7 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
     if (data[0]) {
       return res
         .status(200)
-        .json({ success: true, error: false,Total_amount:total,singleprice:singleprice, productbook_details: data, });
+        .json({ success: true, error: false,Total_amount:total,singleamount:singleprice, productbook_details: data, });
     } else {
       return res
         .status(400)
