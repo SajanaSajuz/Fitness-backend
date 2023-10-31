@@ -111,6 +111,28 @@ userRouter.get("/user-classdetails", async (req, res) => {
         return res.status(400).json({ success: false, error: true, message: "something went wrong" });
     }
 });
+userRouter.get("/user-productdetails/:regid",async (req, res) => { 
+
+    try{
+        const productid =req.params.regid
+        console.log(productid);
+        const data=await trainerModel.findOne({_id:productid})
+
+        if (data) { 
+
+            return res.status(200).json({ success: true, error: false, product_details: data })
+
+        } else {
+
+            return res.status(400).json({ success: false, error: true, message: "No data found" })
+        }
+
+    }catch(error){
+
+        return res.status(400).json({ success: false, error: true, message: "something went wrong" })
+
+    }
+})
 userRouter.get("/user-trainerdetails/:regid",async (req, res) => { 
 
     try{
