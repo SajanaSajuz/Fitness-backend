@@ -85,8 +85,8 @@ ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
     //adding cart amount
     let total = 0;
     for (i = 0; i < data.length; i++) {
-      console.log(data[i].quantity * data[i].Price);
       singleprice = data[i].quantity * data[i].Price;
+      data[i].singleamount=singleprice
       total = total + singleprice;
       console.log(total);
     }
@@ -95,7 +95,6 @@ ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
         success: true,
         error: false,
         Total_amount: total,
-        singleamount: singleprice,
         productbook_details: data,
       });
     } else {
