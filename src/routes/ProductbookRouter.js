@@ -17,22 +17,29 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
       user_id: req.userData.userId,
       status: 0,
     });
-
+console.log(bookedproduct);
     if (bookedproduct) {
-      res.status(500).json({
+
+      const updateddata = await ProductbookModel.updateOne(
+        { quantity: quantity+1},
+      
+      );
+      res.status(400).json({
         success: false,
         error: true,
         message: "Data already added to cart",
+        details:updateddata,
       });
 
     }else {
+
       const result = await ProductbookModel(bookingdata).save();
       
       res.status(201).json({
         success: true,
         error: false,
         message: "Your booking is added to cart",
-        details: result,
+        details:result,
       });
     }
     console.log(result);
@@ -42,7 +49,7 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
   }
 });
 
-ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
+ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
   try {
     const bookingdata = {
       user_id: req.userData.userId,
@@ -144,7 +151,7 @@ ProductbookRouter.get("/increment/:regid", async (req, res) => {
 ProductbookRouter.get("/decrement/:regid", async (req, res) => {
   try {
     const cartid = req.params.regid;
-    const cartdata = await ProductbookModel.findOne({ _id: cartid });
+    const cartdata = await ProductbookModel.findOne({ _id:cartid });
     const data = {
       quantity: cartdata.quantity - 1,
     };
