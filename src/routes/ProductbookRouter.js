@@ -22,7 +22,7 @@ console.log(bookedproduct);
 
       const updateddata = await ProductbookModel.updateOne(
         { quantity: quantity+1},
-      
+        { $set:bookedproduct }
       );
       res.status(400).json({
         success: false,
