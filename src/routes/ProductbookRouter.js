@@ -17,39 +17,32 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
       user_id: req.userData.userId,
       status: 0,
     });
-console.log(bookedproduct);
+    console.log(bookedproduct);
     if (bookedproduct) {
-
-      const updateddata = await ProductbookModel.updateOne(
-        { quantity: quantity+1},
-        { $set:bookedproduct }
-      );
+    
       res.status(400).json({
         success: false,
         error: true,
         message: "Data already added to cart",
-        details:updateddata,
+        details: updateddata,
       });
-
-    }else {
-
+    } else {
       const result = await ProductbookModel(bookingdata).save();
-      
+
       res.status(201).json({
         success: true,
         error: false,
         message: "Your booking is added to cart",
-        details:result,
+        details: result,
       });
     }
     console.log(result);
   } catch (error) {
- 
     console.log(error);
   }
 });
 
-ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
+ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
   try {
     const bookingdata = {
       user_id: req.userData.userId,
@@ -98,15 +91,13 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
       console.log(total);
     }
     if (data[0]) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          error: false,
-          Total_amount: total,
-          singleamount: singleprice,
-          productbook_details: data,
-        });
+      return res.status(200).json({
+        success: true,
+        error: false,
+        Total_amount: total,
+        singleamount: singleprice,
+        productbook_details: data,
+      });
     } else {
       return res
         .status(400)
@@ -132,14 +123,12 @@ ProductbookRouter.get("/increment/:regid", async (req, res) => {
       { $set: data }
     );
     if (datas.modifiedCount == 1) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          error: false,
-          message: "quantity increased",
-          result: datas,
-        });
+      return res.status(200).json({
+        success: true,
+        error: false,
+        message: "quantity increased",
+        result: datas,
+      });
     } else {
       return res
         .status(400)
@@ -151,7 +140,7 @@ ProductbookRouter.get("/increment/:regid", async (req, res) => {
 ProductbookRouter.get("/decrement/:regid", async (req, res) => {
   try {
     const cartid = req.params.regid;
-    const cartdata = await ProductbookModel.findOne({ _id:cartid });
+    const cartdata = await ProductbookModel.findOne({ _id: cartid });
     const data = {
       quantity: cartdata.quantity - 1,
     };
@@ -163,14 +152,12 @@ ProductbookRouter.get("/decrement/:regid", async (req, res) => {
     );
 
     if (datas.modifiedCount == 1) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          error: false,
-          message: "Quantity is decreased",
-          result: datas,
-        });
+      return res.status(200).json({
+        success: true,
+        error: false,
+        message: "Quantity is decreased",
+        result: datas,
+      });
     } else {
       return res
         .status(400)
