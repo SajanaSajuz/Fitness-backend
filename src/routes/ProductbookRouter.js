@@ -1,7 +1,8 @@
 var express = require("express");
 const checkAuth = require("../../Middlewares/checkAuth");
 const ProductbookModel = require("../models/ProductbookModel");
-const mongoose  = require("mongoose");
+const mongoose = require("mongoose");
+const productModel = require("../models/productModel");
 const ProductbookRouter = express.Router();
 ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
   try {
@@ -9,11 +10,24 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
       user_id: req.userData.userId,
       product_id: req.body.product_id,
       status: 0,
-      quantity:1,
+      quantity: 1,
     };
-    
-    const result = await ProductbookModel(bookingdata).save();
-    if (result) {
+    const bookedproduct = await ProductbookModel.findOne({
+      product_id: req.body.product_id,
+      user_id: req.userData.userId,
+      status: 0,
+    });
+
+    if (bookedproduct) {
+      res.status(500).json({
+        success: false,
+        error: true,
+        message: "Data already added to cart",
+      });
+
+    }else {
+      const result = await ProductbookModel(bookingdata).save();
+      
       res.status(201).json({
         success: true,
         error: false,
@@ -23,75 +37,69 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
     }
     console.log(result);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: true,
-        message: "booking not completed",
-      });
+ 
     console.log(error);
   }
 });
 
-
-
-ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
+ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
   try {
     const bookingdata = {
       user_id: req.userData.userId,
       status: 0,
-      quantity:1,
+      quantity: 1,
     };
     const data = await ProductbookModel.aggregate([
-      
-  {
-    '$lookup': {
-      from: 'product_tbs', 
-      localField: 'product_id', 
-      foreignField: '_id', 
-      as: 'productbook',
-    }
-  },
+      {
+        $lookup: {
+          from: "product_tbs",
+          localField: "product_id",
+          foreignField: "_id",
+          as: "productbook",
+        },
+      },
 
       {
         $unwind: "$productbook",
       },
       {
         $match: {
-          user_id: new mongoose.Types.ObjectId(req.userData.userId)
+          user_id: new mongoose.Types.ObjectId(req.userData.userId),
         },
       },
 
       {
         $group: {
           _id: "$_id",
-          user_id:{$first:"$user_id"},  
+          user_id: { $first: "$user_id" },
           Productname: { $first: "$productbook.Productname" },
-          Image: { $first: "$productbook.Image"},
-          Price: { $first: "$productbook.Price"},
-          quantity: { $first:"$quantity"},
-          user_id: { $first:"$user_id"},
-          
-         
+          Image: { $first: "$productbook.Image" },
+          Price: { $first: "$productbook.Price" },
+          quantity: { $first: "$quantity" },
+          user_id: { $first: "$user_id" },
         },
       },
     ]);
     console.log(bookingdata);
 
     //adding cart amount
-    let total=0
-    for(i=0;i<data.length;i++){
-      console.log(data[i].quantity*data[i].Price);
-      singleprice=data[i].quantity*data[i].Price
-      total = total+singleprice
+    let total = 0;
+    for (i = 0; i < data.length; i++) {
+      console.log(data[i].quantity * data[i].Price);
+      singleprice = data[i].quantity * data[i].Price;
+      total = total + singleprice;
       console.log(total);
-    
     }
     if (data[0]) {
       return res
         .status(200)
-        .json({ success: true, error: false,Total_amount:total,singleamount:singleprice, productbook_details: data, });
+        .json({
+          success: true,
+          error: false,
+          Total_amount: total,
+          singleamount: singleprice,
+          productbook_details: data,
+        });
     } else {
       return res
         .status(400)
@@ -104,53 +112,63 @@ ProductbookRouter.get("/viewcart/",checkAuth, async (req, res) => {
   }
 });
 
-
-ProductbookRouter.get("/increment/:regid",async(req,res)=>{
-  try{
-  cartid = req.params.regid;
-  cartdata=await ProductbookModel.findOne({_id:cartid})
-  const data ={
-    quantity:(cartdata.quantity)+1
-  }
-  console.log(data);
-  const datas =await ProductbookModel.updateOne({_id:cartid},{$set:data})
-  if (datas.modifiedCount==1){
-    return res.status(200).json({success:true,error:false,message:"quantity increased",result:datas})
-  }
-else{
-  return res.status(400).json({succes:false,error:true,message:"failed to increase"})
-}
-  }
-catch(error){
-
-}
-})
-
-
-ProductbookRouter.get("/decrement/:regid",async(req,res)=>{
-  try{
-    const cartid = req.params.regid;
-    const cartdata= await ProductbookModel.findOne({_id:cartid})
-    const data={
-      quantity :(cartdata.quantity)-1 
-    }
+ProductbookRouter.get("/increment/:regid", async (req, res) => {
+  try {
+    cartid = req.params.regid;
+    cartdata = await ProductbookModel.findOne({ _id: cartid });
+    const data = {
+      quantity: cartdata.quantity + 1,
+    };
     console.log(data);
-    
-    const datas = await ProductbookModel.updateOne({ _id: cartid},{$set:data}); 
-    
-    if(datas.modifiedCount==1){
-
-      return res.status(200).json({ success: true, error: false, message: "Quantity is decreased", result:datas});
+    const datas = await ProductbookModel.updateOne(
+      { _id: cartid },
+      { $set: data }
+    );
+    if (datas.modifiedCount == 1) {
+      return res
+        .status(200)
+        .json({
+          success: true,
+          error: false,
+          message: "quantity increased",
+          result: datas,
+        });
+    } else {
+      return res
+        .status(400)
+        .json({ succes: false, error: true, message: "failed to increase" });
     }
-    
+  } catch (error) {}
+});
 
-    else {
+ProductbookRouter.get("/decrement/:regid", async (req, res) => {
+  try {
+    const cartid = req.params.regid;
+    const cartdata = await ProductbookModel.findOne({ _id: cartid });
+    const data = {
+      quantity: cartdata.quantity - 1,
+    };
+    console.log(data);
 
-      return res.status(400).json({ success: false, error: true, message: "Failed to decrease" })
-  }
-  }
-  catch(error){
+    const datas = await ProductbookModel.updateOne(
+      { _id: cartid },
+      { $set: data }
+    );
 
-  }
-})
+    if (datas.modifiedCount == 1) {
+      return res
+        .status(200)
+        .json({
+          success: true,
+          error: false,
+          message: "Quantity is decreased",
+          result: datas,
+        });
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, error: true, message: "Failed to decrease" });
+    }
+  } catch (error) {}
+});
 module.exports = ProductbookRouter;
