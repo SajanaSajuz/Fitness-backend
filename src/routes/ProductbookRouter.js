@@ -20,11 +20,12 @@ ProductbookRouter.post("/cart", checkAuth, async (req, res) => {
     console.log(bookedproduct);
     if (bookedproduct) {
     
+      
       res.status(400).json({
         success: false,
         error: true,
         message: "Data already added to cart",
-        details: updateddata,
+        
       });
     } else {
       const result = await ProductbookModel(bookingdata).save();
@@ -95,7 +96,6 @@ ProductbookRouter.get("/viewcart/", checkAuth, async (req, res) => {
         success: true,
         error: false,
         Total_amount: total,
-        single_amount: data[i].singleamount,
         productbook_details: data,
       });
     } else {
