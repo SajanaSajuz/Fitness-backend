@@ -208,12 +208,13 @@ adminRouter.get("/trainerdetails/:regid", async (req, res) => {
   try {
     const trainerid = req.params.regid;
     const data = await trainerModel.findOne({ _id:trainerid });
-    console.log(data);
+   
     if (data) {
       return res
         .status(200)
         .json({ success: true, error: false, trainer_details: data });
     } else {
+      console.log(data);
       return res
         .status(400)
         .json({ success: false, error: true, message: "No data found" });
