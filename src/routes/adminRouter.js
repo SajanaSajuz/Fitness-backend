@@ -233,7 +233,7 @@ adminRouter.get("/trainerdetails/:regid", async (req, res) => {
 
 adminRouter.post("/update-trainer", async (req, res) => {
   try {
-    const trainer_id = req.body.id;
+    const trainer_id = req.body._id;
     const data = {
       TrainerName: req.body.TrainerName,
       Phone: req.body.Phone,
@@ -246,9 +246,10 @@ adminRouter.post("/update-trainer", async (req, res) => {
     };
     console.log(data);
     const datass = await trainerModel.updateOne(
-      { id: trainer_id },
+      { _id: trainer_id },
       { $set: data }
-    ); //to update
+    ); 
+    console.log(datass);
     if (datass) {
       return res
         .status(200)
@@ -267,16 +268,17 @@ adminRouter.post("/update-trainer", async (req, res) => {
   }
 });
 //to delete the trainer
-adminRouter.get("/trainerdelete/:id", async (req, res) => {
+adminRouter.delete("/trainerdelete/:id", async (req, res) => {
   try {
     const deleteData = await trainerModel.deleteOne({
-      _id: req.params.trainerid,
+      trainerid: req.params.id,
     });
-    if (deleteData) {
+    if (deleteData.deletedCount==1) {
       res
         .status(201)
         .json({ success: true, error: false, message: "trainer deleted" });
     } else {
+      console.log(deleteData);
       res
         .status(500)
         .json({ success: false, error: true, message: "Failed to delete" });
